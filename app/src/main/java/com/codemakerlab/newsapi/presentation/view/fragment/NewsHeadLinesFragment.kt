@@ -34,6 +34,7 @@ class NewsHeadLinesFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentNewsHeadLinesBinding.bind(view)
         viewModel = (activity as MainActivity).viewModel
+        newsAdapter = (activity as MainActivity).newsAdapter
 
         initRecyclerView()
         viewNewsList()
@@ -68,7 +69,6 @@ class NewsHeadLinesFragment : Fragment() {
     }
 
     private fun initRecyclerView() {
-        newsAdapter = NewsAdapter()
         binding.rvNews.apply {
             adapter = newsAdapter
             layoutManager = LinearLayoutManager(activity)
