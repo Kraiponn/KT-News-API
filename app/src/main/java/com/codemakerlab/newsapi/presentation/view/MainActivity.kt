@@ -2,13 +2,22 @@ package com.codemakerlab.newsapi.presentation.view
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.codemakerlab.newsapi.R
 import com.codemakerlab.newsapi.databinding.ActivityMainBinding
-//import kotlinx.android.synthetic.main.activity_main.*
+import com.codemakerlab.newsapi.presentation.viewmodel.NewsViewModel
+import com.codemakerlab.newsapi.presentation.viewmodel.NewsViewModelFactory
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
+    @Inject
+    lateinit var factory: NewsViewModelFactory
+    lateinit var viewModel: NewsViewModel
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,6 +33,9 @@ class MainActivity : AppCompatActivity() {
             supportFragmentManager.findFragmentById(R.id.navHostFragment) as NavHostFragment
         val navController = navHost.navController
         binding.bottomNavigationView.setupWithNavController(navController)
+
+        viewModel = ViewModelProvider(this, factory)
+            .get(NewsViewModel::class.java)
 
     }
 }
