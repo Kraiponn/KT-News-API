@@ -1,4 +1,4 @@
-package com.codemakerlab.newsapi.presentation.repository
+package com.codemakerlab.newsapi.domain.repository
 
 import com.codemakerlab.newsapi.data.model.APIResponse
 import com.codemakerlab.newsapi.data.model.Article
@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface NewsRepository {
 
-    suspend fun getNewsHeadLines(): Resource<APIResponse>
+    suspend fun getNewsHeadLines(country: String, page: Int): Resource<APIResponse>
     suspend fun getSearchedNews(searchQuery: String): Resource<APIResponse>
     suspend fun saveNews(article: Article)
     suspend fun deleteNews(article: Article)

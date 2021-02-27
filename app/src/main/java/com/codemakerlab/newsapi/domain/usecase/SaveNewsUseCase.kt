@@ -1,9 +1,7 @@
-package com.codemakerlab.newsapi.presentation.usecase
+package com.codemakerlab.newsapi.domain.usecase
 
-import com.codemakerlab.newsapi.data.model.APIResponse
 import com.codemakerlab.newsapi.data.model.Article
-import com.codemakerlab.newsapi.presentation.repository.NewsRepository
-import com.codemakerlab.newsapi.utils.Resource
+import com.codemakerlab.newsapi.domain.repository.NewsRepository
 
 class SaveNewsUseCase(
     private val newsRepository: NewsRepository
