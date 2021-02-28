@@ -2,6 +2,7 @@ package com.codemakerlab.newsapi.presentation.di
 
 import com.codemakerlab.newsapi.domain.repository.NewsRepository
 import com.codemakerlab.newsapi.domain.usecase.GetNewsHeadLinesUseCase
+import com.codemakerlab.newsapi.domain.usecase.GetSearchedNewsUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -18,6 +19,14 @@ class UseCaseModule {
         newsRepository: NewsRepository
     ): GetNewsHeadLinesUseCase {
         return GetNewsHeadLinesUseCase(newsRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideGetSearchedNewsUseCase(
+        newsRepository: NewsRepository
+    ): GetSearchedNewsUseCase {
+        return GetSearchedNewsUseCase(newsRepository)
     }
 
 }

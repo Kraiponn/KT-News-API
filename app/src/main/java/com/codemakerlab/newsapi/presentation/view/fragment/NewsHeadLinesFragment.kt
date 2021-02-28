@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AbsListView
 import android.widget.Toast
+import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,6 +20,9 @@ import com.codemakerlab.newsapi.presentation.adapter.NewsAdapter
 import com.codemakerlab.newsapi.presentation.view.MainActivity
 import com.codemakerlab.newsapi.presentation.viewmodel.NewsViewModel
 import com.codemakerlab.newsapi.utils.Resource
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class NewsHeadLinesFragment : Fragment() {
     private lateinit var viewModel: NewsViewModel
@@ -58,6 +62,7 @@ class NewsHeadLinesFragment : Fragment() {
 
         initRecyclerView()
         viewNewsList()
+        setSearchView()
     }
 
     private fun viewNewsList() {
@@ -132,12 +137,82 @@ class NewsHeadLinesFragment : Fragment() {
 
             val hasReachedToEnd = topPosition + visibleItems >= sizeOfTheCurrentList
             val shouldPaginate = !isLoading && !isLastPage && hasReachedToEnd && isScrolling
-            if(shouldPaginate) {
+            if (shouldPaginate) {
                 page++
                 viewModel.getNewsHeadLines(country, page)
                 isScrolling = false
             }
         }
+    }
+
+    // Searched news
+    private fun setSearchView() {
+        binding.svNews.setOnQueryTextListener(
+            object : android.widget.SearchView.OnQueryTextListener{
+                override fun onQueryTextSubmit(query: String?): Boolean {
+                    viewModel.searchNews("us", query.toString(), page)
+                    viewSearchedNews()
+                    return false
+                }
+
+                override fun onQueryTextChange(newText: String?): Boolean {
+                    MainScope().launch {
+                        // this: CoroutinesScope
+                        delay(2000)
+                        viewModel.searchNews("us", newText.toString(), page)
+                        viewSearchedNews()
+                    }
+
+                    return false
+                }
+            }
+        )
+
+        binding.svNews.setOnCloseListener(
+            object : android.widget.SearchView.OnCloseListener {
+                override fun onClose(): Boolean {
+                    initRecyclerView()
+                    viewNewsList()
+                    return false
+                }
+            }
+        )
+    }
+
+    private fun viewSearchedNews() {
+        viewModel.searchedNews.observe(viewLifecycleOwner,
+            Observer { resource: Resource<APIResponse> ->
+                when (resource) {
+                    is Resource.Success ->   {
+                        hideProgressBar()
+                        resource.data?.let { apiResponse: APIResponse ->
+                            Log.d("MyTag", "Came here ${apiResponse.articles.toList().size}")
+                            newsAdapter.differ.submitList(apiResponse.articles.toList())
+
+                            pages = if (apiResponse.totalResults % 20 == 0) {
+                                apiResponse.totalResults / 20
+                            } else {
+                                apiResponse.totalResults / 20 + 1
+                            }
+
+                            isLastPage = page == pages
+                        }
+                    }
+                    is Resource.Loading -> {
+                        showProgressBar()
+                    }
+                    is Resource.Error -> {
+                        hideProgressBar()
+                        resource.message?.let {
+                            Toast.makeText(
+                                activity,
+                                "An error occurred: $it",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    }
+                }
+            })
     }
 
 }

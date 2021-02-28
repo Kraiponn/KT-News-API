@@ -10,13 +10,15 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.codemakerlab.newsapi.data.model.APIResponse
 import com.codemakerlab.newsapi.domain.usecase.GetNewsHeadLinesUseCase
+import com.codemakerlab.newsapi.domain.usecase.GetSearchedNewsUseCase
 import com.codemakerlab.newsapi.utils.Resource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class NewsViewModel(
     private val app: Application,
-    private val getNewsHeadLinesUseCase: GetNewsHeadLinesUseCase
+    private val getNewsHeadLinesUseCase: GetNewsHeadLinesUseCase,
+    private val getSearchedNewsUseCase: GetSearchedNewsUseCase
 ) : AndroidViewModel(app) {
 
     val newsHeadLines: MutableLiveData<Resource<APIResponse>> = MutableLiveData()
@@ -64,5 +66,30 @@ class NewsViewModel(
             }
         }
         return false
+    }
+
+
+    /**************
+     * Searched news
+     */
+    val searchedNews: MutableLiveData<Resource<APIResponse>> = MutableLiveData()
+
+    fun searchNews(
+        country: String,
+        searchQuery: String,
+        page: Int
+    ) = viewModelScope.launch {
+        // this: CoroutinesScope
+        try {
+            searchedNews.postValue(Resource.Loading())
+            if(isNetworkAvailable(app)){
+                val response = getSearchedNewsUseCase.execute(country, searchQuery, page)
+                searchedNews.postValue(response)
+            } else {
+                searchedNews.postValue(Resource.Error("No internet connection"))
+            }
+        }catch (ex: Exception) {
+            searchedNews.postValue(Resource.Error(ex.message.toString()))
+        }
     }
 }
