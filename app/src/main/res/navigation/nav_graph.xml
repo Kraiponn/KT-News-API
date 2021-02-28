@@ -33,5 +33,8 @@
         <action
             android:id="@+id/action_infoFragment_to_newsHeadLinesFragment"
             app:destination="@id/newsHeadLinesFragment" />
+        <argument
+            android:name="selected_article"
+            app:argType="com.codemakerlab.newsapi.data.model.Article" />
     </fragment>
 </navigation>

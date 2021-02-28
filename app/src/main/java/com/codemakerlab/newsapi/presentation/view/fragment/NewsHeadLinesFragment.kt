@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.AbsListView
 import android.widget.Toast
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.codemakerlab.newsapi.R
@@ -42,6 +43,18 @@ class NewsHeadLinesFragment : Fragment() {
         binding = FragmentNewsHeadLinesBinding.bind(view)
         viewModel = (activity as MainActivity).viewModel
         newsAdapter = (activity as MainActivity).newsAdapter
+        newsAdapter.setOnItemClickListener {
+            // it: Article
+            val bundle = Bundle().apply {
+                //this: Bundle
+                putSerializable("selected_article", it)
+            }
+
+            findNavController().navigate(
+                R.id.action_newsHeadLinesFragment_to_infoFragment,
+                bundle
+            )
+        }
 
         initRecyclerView()
         viewNewsList()
